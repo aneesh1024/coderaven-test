@@ -2,17 +2,10 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 
-import path, { dirname } from "path";
-import { fileURLToPath } from "url";
-
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = 3000;
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 const ACTIONS = {
   JOIN: "join",
   JOINED: "joined",
@@ -21,11 +14,6 @@ const ACTIONS = {
   SYNC_CODE: "sync-code",
   LEAVE: "leave",
 };
-
-app.use(express.static("dist"));
-app.use((req, res, next) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
 
 const userSocketMap = {};
 const getAllConnectedClients = (roomId) => {
@@ -36,6 +24,9 @@ const getAllConnectedClients = (roomId) => {
   );
 };
 
+app.get('/',(req, res) => {
+    res.json({api:'CodeRaven server'})
+})
 io.on("connection", (socket) => {
   socket.on(ACTIONS.JOIN, ({ roomId, userName }) => {
     userSocketMap[socket.id] = userName;
